@@ -4,12 +4,11 @@ import (
 	"audio-language/wiktionary/lemma/constants"
 	"audio-language/wiktionary/lemma/output/parser"
 	"audio-language/wiktionary/lemma/token"
-	"fmt"
 )
 
 type item struct {
 	PartOfSpeech string
-	Lemma        string
+	Lemma        []string
 	Exists       bool
 }
 
@@ -42,7 +41,7 @@ func (w *LemmasWrapper) GetLemmas() {
 	language := w.Language
 
 	if !t.FileExists {
-		fmt.Printf("\nSkipping %v -- no tokens file exists\n", w.Word)
+		// fmt.Printf("\nSkipping %v -- no tokens file exists\n", w.Word)
 		return
 	}
 	w.HasContent = true
@@ -60,13 +59,8 @@ func (w *LemmasWrapper) GetLemmas() {
 		parser := parser.GetParser(language, w.Word, partOfSpeech)
 		parsed, exists := parser(tokensItemForPos)
 		l.Exists = exists
-		if exists {
-			if len(parsed) > 1 {
-				fmt.Println("\n", w.Word, partOfSpeech, exists, parsed)
-				panic("multiple lemmas??")
-			}
-			l.Lemma = parsed[0]
-		}
+		l.Lemma = parsed
+
 		w.Content = append(w.Content, l)
 	}
 }
