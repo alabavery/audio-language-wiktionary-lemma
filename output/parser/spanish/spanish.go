@@ -1,10 +1,10 @@
 package spanish
 
 // GetSpanishSingleTokenParser gets parser for particular part of speech
-func GetSpanishSingleTokenParser(partOfSpeech string) func(string) []string {
+func GetSpanishSingleTokenParser(word string, partOfSpeech string) func(string) []string {
 	switch partOfSpeech {
 	case "verb":
-		return parseVerbLemma
+		return getParseVerbLemma(word)
 	default:
 		return func(string) []string {
 			return []string{}

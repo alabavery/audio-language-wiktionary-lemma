@@ -1,58 +1,37 @@
 package spanish
 
 import (
+	"regexp"
 	"strings"
 )
 
-// type patternComponent struct {
-// 	name    string
-// 	pattern string
-// }
-
-// var pattern1Components = []patternComponent{
-// 	{
-// 		name:    "pipe-lookbehind",
-// 		pattern: "(?<=|)",
-// 	},
-// 	{
-// 		name:    "lemma",
-// 		pattern: "[a-z]+",
-// 	},
-// 	{
-// 		name:    "end-brackets",
-// 		pattern: "(?=}{1,2}$)",
-// 	},
-// }
-
-// func makeRegex(patternComponents []patternComponent) *regexp.Regexp {
-// 	pattern := ""
-// 	for _, component := range patternComponents {
-// 		pattern += component.pattern
-// 	}
-// 	return regexp.MustCompile(pattern)
-// }
-
-func parseVerbLemma(tok string) []string {
-	return basic(tok)
+func getParseVerbLemma(word string) func(string) []string {
+	return basic
 }
 
 func basic(t string) []string {
-	found := []string{}
+	re := regexp.MustCompile("^[a-z]+r$")
+	return onEachSection(t, func(section string) []string {
+		return re.FindAllString(section, -1)
+	})
+}
 
-	sections := strings.Split(t, "|")
-	if len(sections) == 0 {
-		return found
+func onEachSection(t string, parse func(string) []string) []string {
+	openBracketSections := strings.Split(t, "{")
+	bracketLessSections := []string{}
+	for _, s := range openBracketSections {
+		bracketLessSections = append(bracketLessSections, strings.Split(s, "}")...)
 	}
-	firstSection := sections[0]
-	if !strings.HasSuffix(firstSection, "form of") {
-		return found
+	sections := []string{}
+	for _, s := range bracketLessSections {
+		sections = append(sections, strings.Split(s, "|")...)
 	}
 
-	last := sections[len(sections)-1]
-	bracketStarts := strings.Index(last, "}")
-	if bracketStarts == -1 {
-		return found
+	results := []string{}
+	for _, section := range sections {
+		for _, r := range parse(section) {
+			results = append(results, r)
+		}
 	}
-	found = append(found, last[:bracketStarts])
-	return found
+	return results
 }

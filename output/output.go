@@ -1,7 +1,7 @@
 package output
 
 import (
-	"audio-language/wiktionary/lemma/definition"
+	"audio-language/wiktionary/lemma/constants"
 	"audio-language/wiktionary/lemma/output/parser"
 	"audio-language/wiktionary/lemma/token"
 	"fmt"
@@ -15,68 +15,63 @@ type item struct {
 
 // LemmasWrapper wraps lemmas
 type LemmasWrapper struct {
-	Language           string
-	Word               string
-	Content            []item
-	HasContent         bool
-	definitionsWrapper *definition.DefinitionsWrapper
-	tokensWrapper      *token.TokensWrapper
+	Language      string
+	Word          string
+	Content       []item
+	HasContent    bool
+	tokensWrapper *token.TokensWrapper
 }
 
 // NewLemmasWrapper gives a LemmasWrapper
 func NewLemmasWrapper(
 	word string,
 	language string,
-	d *definition.DefinitionsWrapper,
 	t *token.TokensWrapper,
 ) *LemmasWrapper {
 	return &LemmasWrapper{
-		Language:           language,
-		Word:               word,
-		HasContent:         false,
-		definitionsWrapper: d,
-		tokensWrapper:      t,
+		Language:      language,
+		Word:          word,
+		HasContent:    false,
+		tokensWrapper: t,
 	}
 }
 
 // GetLemmas saves lemmas for each part of speech into the Content of the LemmasWrapper
 func (w *LemmasWrapper) GetLemmas() {
-	d := w.definitionsWrapper
 	t := w.tokensWrapper
 	language := w.Language
 
-	if !d.FileExists {
-		// currently, we are relying on definitions to tell us which items in
-		// tokens are parts of speech and which are irrelevant (e.g. Pronunciation)
-		return
-	}
 	if !t.FileExists {
-		// unexpected state -- tokens should always exist if definitions exist
-		panic("definition file exists, but tokens file does not")
+		fmt.Printf("\nSkipping %v -- no tokens file exists\n", w.Word)
+		return
 	}
 	w.HasContent = true
 
-	for _, partOfSpeechItem := range d.Content {
-		l := item{
-			PartOfSpeech: partOfSpeechItem.PartOfSpeech,
+	for _, section := range t.Content {
+		if !isPartOfSpeechName(section.Name) {
+			continue
 		}
-		if partOfSpeechItem.IsDefined() {
-			l.Lemma = d.Word
-			l.Exists = true
-		} else {
-			partOfSpeech := partOfSpeechItem.PartOfSpeech
-			tokensItemForPos := t.GetItem(partOfSpeech)
-			parser := parser.GetParser(language, partOfSpeech)
-			parsed, exists := parser(tokensItemForPos)
-			l.Exists = exists
-			if exists {
-				if len(parsed) > 1 {
-					fmt.Println("\n", w.Word, partOfSpeech, exists, parsed)
-					panic("multiple lemmas??")
-				}
-				l.Lemma = parsed[0]
+		partOfSpeech := section.Name
+		l := item{
+			PartOfSpeech: partOfSpeech,
+			Exists:       false,
+		}
+		tokensItemForPos := t.GetItem(partOfSpeech)
+		parser := parser.GetParser(language, w.Word, partOfSpeech)
+		parsed, exists := parser(tokensItemForPos)
+		l.Exists = exists
+		if exists {
+			if len(parsed) > 1 {
+				fmt.Println("\n", w.Word, partOfSpeech, exists, parsed)
+				panic("multiple lemmas??")
 			}
+			l.Lemma = parsed[0]
 		}
 		w.Content = append(w.Content, l)
 	}
+}
+
+func isPartOfSpeechName(name string) bool {
+	_, exists := constants.PartsOfSpeech[name]
+	return exists
 }
