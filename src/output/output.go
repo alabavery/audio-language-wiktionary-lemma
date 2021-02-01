@@ -7,9 +7,9 @@ import (
 )
 
 type item struct {
-	PartOfSpeech string
-	Lemma        []string
-	Exists       bool
+	PartOfSpeech string   `json:"part_of_speech"`
+	Lemmas       []string `json:"lemmas"`
+	Exists       bool     `json:"exists"`
 }
 
 // LemmasWrapper wraps lemmas
@@ -59,7 +59,7 @@ func (w *LemmasWrapper) GetLemmas() {
 		parser := parser.GetParser(language, w.Word, partOfSpeech)
 		parsed, exists := parser(tokensItemForPos)
 		l.Exists = exists
-		l.Lemma = parsed
+		l.Lemmas = parsed
 
 		w.Content = append(w.Content, l)
 	}

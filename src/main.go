@@ -13,7 +13,6 @@ import (
 
 func main() {
 	wordsFile, tokensDir, language, targetDirectory := getFlags()
-	shouldSave := targetDirectory != ""
 	words := word.GetWords(wordsFile)
 
 	lemmas := []*output.LemmasWrapper{}
@@ -29,8 +28,8 @@ func main() {
 		total += partsOfSpeech
 		lemmad += lemmas
 	}
-	size := save(shouldSave, targetDirectory, lemmas)
-	fmt.Printf("\nTotal items: %v; Total lemmas: %v (%v); JSON size: %v", total, lemmad, float32(lemmad)/float32(total), size)
+	save(targetDirectory, lemmas)
+	fmt.Printf("\nTotal items: %v; Total lemmas: %v (%v)", total, lemmad, float32(lemmad)/float32(total))
 }
 
 func getFlags() (string, string, string, string) {
@@ -73,16 +72,17 @@ func getSingleWordStats(l *output.LemmasWrapper, wordRank int) (int, int) {
 	return total, lemmad
 }
 
-func save(realSave bool, targetDirectory string, lemmas []*output.LemmasWrapper) string {
-	out, err := json.Marshal(lemmas)
-	if err != nil {
-		panic("Could not marshal json")
-	}
-	if realSave {
-		err := ioutil.WriteFile(targetDirectory+"/lemmas.json", out, 0644)
-		if err != nil {
-			panic("could not save file")
+func save(targetDirectory string, lemmas []*output.LemmasWrapper) {
+	for _, l := range lemmas {
+		if l.HasContent {
+			out, err := json.Marshal(l.Content)
+			if err != nil {
+				panic("Could not marshal json")
+			}
+			err = ioutil.WriteFile(fmt.Sprintf("%v/%v.json", targetDirectory, l.Word), out, 0644)
+			if err != nil {
+				panic("could not save file")
+			}
 		}
 	}
-	return fmt.Sprintf("%v kilobytes", len(out)/1000)
 }
