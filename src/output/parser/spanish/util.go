@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-func onEachSection(t string, parse func(string, int, []string) []string) []string {
+func getSectionsOfSingleToken(t string) []string {
 	openBracketSections := strings.Split(t, "{")
 	bracketLessSections := []string{}
 	for _, s := range openBracketSections {
@@ -14,7 +14,11 @@ func onEachSection(t string, parse func(string, int, []string) []string) []strin
 	for _, s := range bracketLessSections {
 		sections = append(sections, strings.Split(s, "|")...)
 	}
+	return sections
+}
 
+func onEachSection(t string, parse func(string, int, []string) []string) []string {
+	sections := getSectionsOfSingleToken(t)
 	results := []string{}
 	for i, section := range sections {
 		results = append(results, parse(section, i, sections)...)

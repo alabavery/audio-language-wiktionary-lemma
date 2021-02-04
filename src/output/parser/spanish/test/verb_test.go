@@ -46,3 +46,12 @@ func TestPuedo(t *testing.T) {
 		token:        "# {{es-verb form of|ending=er|mood=indicative|tense=present|pers=1|number=singular|poder}",
 	})
 }
+
+func TestDarnos(t *testing.T) {
+	runTest(t, testData{
+		partOfSpeech: "verb",
+		word:         "darnos",
+		lemma:        "dar",
+		token:        "# {{es-compound of|d|ar|dar|nos|mood=inf}}",
+	})
+}
