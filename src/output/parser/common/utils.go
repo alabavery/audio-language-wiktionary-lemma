@@ -12,6 +12,9 @@ import (
 // that don't we will consider them their own lemma
 func IsOwnLemma(item token.TokensItem) bool {
 	for _, t := range item.Tokens {
+		if strings.Contains(t, "form of|") {
+			return false
+		}
 		if tokenIsHead(t) {
 			return !strings.Contains(t, "form")
 		}

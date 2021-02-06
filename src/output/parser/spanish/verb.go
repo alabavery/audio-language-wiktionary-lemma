@@ -24,8 +24,8 @@ func basic(t string) []string {
 
 func compound(t string) []string {
 	return onEachSection(t, func(section string, idx int, allSections []string) []string {
-		if strings.Contains(section, "compound") && idx+3 < len(allSections) {
-			return []string{allSections[idx+3]}
+		if strings.Contains(section, "compound") && idx+2 < len(allSections) {
+			return []string{allSections[idx+1] + allSections[idx+2]}
 		}
 		return []string{}
 	})

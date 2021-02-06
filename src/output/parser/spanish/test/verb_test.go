@@ -55,3 +55,12 @@ func TestDarnos(t *testing.T) {
 		token:        "# {{es-compound of|d|ar|dar|nos|mood=inf}}",
 	})
 }
+
+func TestDarme(t *testing.T) {
+	runTest(t, testData{
+		partOfSpeech: "verb",
+		word:         "darnos",
+		lemma:        "dar",
+		token:        "# {{es-compound of|d|ar||me|mood=inf}}",
+	})
+}
