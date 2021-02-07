@@ -1,8 +1,6 @@
 package definition
 
-import (
-	"audio-language/wiktionary/lemma/util"
-)
+import "github.com/ninetypercentlanguage/misc/files"
 
 // PartOfSpeechDefinitions has definitions for single part of speech
 type PartOfSpeechDefinitions struct {
@@ -31,7 +29,7 @@ func NewDefinitionsWrapper(word string, definitionsDir string) *DefinitionsWrapp
 
 func getFileContent(word string, definitionsDir string) ([]PartOfSpeechDefinitions, bool) {
 	var posDefs []PartOfSpeechDefinitions
-	exists := util.GetJSONWhenFileMayNotExist(
+	exists := files.GetJSONWhenFileMayNotExist(
 		definitionsDir+"/"+word+".json",
 		&posDefs,
 	)

@@ -1,22 +1,18 @@
 package output
 
 import (
-	"audio-language/wiktionary/lemma/constants"
 	"audio-language/wiktionary/lemma/output/parser"
 	"audio-language/wiktionary/lemma/token"
-)
 
-type item struct {
-	PartOfSpeech string   `json:"part_of_speech"`
-	Lemmas       []string `json:"lemmas"`
-	Exists       bool     `json:"exists"`
-}
+	"github.com/ninetypercentlanguage/word-utils/constants"
+	"github.com/ninetypercentlanguage/word-utils/lemma"
+)
 
 // LemmasWrapper wraps lemmas
 type LemmasWrapper struct {
 	Language      string
 	Word          string
-	Content       []item
+	Content       lemma.Content
 	HasContent    bool
 	tokensWrapper *token.TokensWrapper
 }
@@ -51,7 +47,7 @@ func (w *LemmasWrapper) GetLemmas() {
 			continue
 		}
 		partOfSpeech := section.Name
-		l := item{
+		l := lemma.Item{
 			PartOfSpeech: partOfSpeech,
 			Exists:       false,
 		}

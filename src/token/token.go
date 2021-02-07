@@ -1,7 +1,7 @@
 package token
 
 import (
-	"audio-language/wiktionary/lemma/util"
+	"github.com/ninetypercentlanguage/misc/files"
 )
 
 // TokensItem is a single part of speech (or irrelevant datapoint)
@@ -31,7 +31,7 @@ func NewTokensWrapper(word string, tokensDir string) *TokensWrapper {
 
 func getFileContent(word string, tokensDir string) ([]TokensItem, bool) {
 	var content []TokensItem
-	exists := util.GetJSONWhenFileMayNotExist(
+	exists := files.GetJSONWhenFileMayNotExist(
 		tokensDir+"/"+word+".json",
 		&content,
 	)
